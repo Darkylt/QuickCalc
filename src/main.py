@@ -19,6 +19,8 @@ class QuickCalc:
         self.root.configure(bg="#333333")
         self.root.attributes("-topmost", True)
 
+        self.root.protocol("WM_DELETE_WINDOW", self.hide_window)
+
         self.text_var = tk.StringVar()
         self.suggestion_var = tk.StringVar()
 
