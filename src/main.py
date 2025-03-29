@@ -124,7 +124,8 @@ def quit_program(app, tray_icon):
     """Properly quit the program"""
     app.hide_window()
     tray_icon.stop()
-    sys.exit(0)  # Exit the program
+    app.root.quit()
+    app.root.destroy()
 
 
 if __name__ == "__main__":
