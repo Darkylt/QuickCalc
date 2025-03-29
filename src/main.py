@@ -17,6 +17,7 @@ class QuickCalc:
 
         self.root.title("QuickCalc")
         self.root.geometry("400x120")
+        self.root.minsize(400, 120)  # Set minimum width and height
         self.root.configure(bg="#333333")
         self.root.attributes("-topmost", True)
 
@@ -25,16 +26,17 @@ class QuickCalc:
         self.text_var = tk.StringVar()
         self.suggestion_var = tk.StringVar()
 
-        self.entry = tk.Entry(
+        self.text_widget = tk.Text(
             self.root,
-            textvariable=self.text_var,
             font=("Arial", 16),
             bg="#333333",
             fg="white",
             insertbackground="white",
+            wrap="word",
+            height=2,
         )
-        self.entry.pack(expand=True, fill="both", padx=10, pady=5)
-        self.entry.bind("<KeyRelease>", self.update_suggestion)
+        self.text_widget.pack(expand=True, fill="both", padx=10, pady=5)
+        self.text_widget.bind("<KeyRelease>", self.update_suggestion)
 
         self.suggestion_label = tk.Label(
             self.root,
@@ -42,6 +44,7 @@ class QuickCalc:
             font=("Arial", 14),
             bg="#333333",
             fg="gray",
+            height=1,
         )
         self.suggestion_label.pack(fill="x", padx=10, pady=5)
 
@@ -56,7 +59,7 @@ class QuickCalc:
                 self.root.deiconify(),
                 self.root.lift(),
                 self.root.focus_force(),
-                self.entry.focus_set(),
+                self.text_widget.focus_set(),
             ],
         )
 
@@ -66,10 +69,9 @@ class QuickCalc:
 
     def update_suggestion(self, event=None):
         """Dynamically updates the suggestion label when typing"""
-        text = self.text_var.get()
+        text = self.text_widget.get("1.0", "end-1c")
         if text.endswith("="):
             try:
-                # Extract the last valid math expression using regex
                 match = re.search(r"([0-9+\-*/().]+)=$", text)
                 if match:
                     expr = match.group(1)
@@ -94,11 +96,8 @@ class QuickCalc:
     def complete_calculation(self, event=None):
         """Completes the calculation when Enter or Tab is pressed"""
         if self.suggestion_var.get():
-            self.text_var.set(self.text_var.get() + self.suggestion_var.get())
+            self.text_widget.insert("end", self.suggestion_var.get())
             self.suggestion_var.set("")
-
-            self.entry.icursor(len(self.text_var.get()))
-            self.entry.select_clear()
         return "break"
 
     def run(self):
