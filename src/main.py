@@ -1,13 +1,18 @@
+import threading
 import tkinter as tk
 
 import keyboard
 import sympy as sp
+from PIL import Image
+from pystray import Icon, Menu, MenuItem
 
 
 class QuickCalc:
     def __init__(self):
         self.root = tk.Tk()
         self.root.withdraw()
+
+        self.root.iconbitmap("assets/icon.ico")
 
         self.root.title("QuickCalc")
         self.root.geometry("400x120")
@@ -42,10 +47,15 @@ class QuickCalc:
 
     def show_window(self):
         print("Showing window")
-        self.root.deiconify()
-        self.root.lift()
-        self.root.focus_force()
-        self.entry.focus_set()
+        self.root.after(
+            0,
+            lambda: [
+                self.root.deiconify(),
+                self.root.lift(),
+                self.root.focus_force(),
+                self.entry.focus_set(),
+            ],
+        )
 
     def hide_window(self):
         print("Hiding window")
@@ -87,5 +97,15 @@ class QuickCalc:
         self.root.mainloop()
 
 
-app = QuickCalc()
-app.run()
+def create_tray_icon():
+    icon_image = Image.open("assets/icon.ico")
+    menu = Menu(MenuItem("Quit", lambda: app.hide_window()))
+    tray_icon = Icon("QuickCalc", icon_image, menu=menu)
+
+    threading.Thread(target=tray_icon.run, daemon=True).start()
+
+
+if __name__ == "__main__":
+    app = QuickCalc()
+    create_tray_icon()
+    app.run()
