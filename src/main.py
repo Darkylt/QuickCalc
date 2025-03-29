@@ -1,4 +1,5 @@
 import re
+import sys
 import threading
 import tkinter as tk
 
@@ -104,15 +105,25 @@ class QuickCalc:
         self.root.mainloop()
 
 
-def create_tray_icon():
+def create_tray_icon(app):
     icon_image = Image.open("assets/icon.ico")
-    menu = Menu(MenuItem("Quit", lambda: app.hide_window()))
-    tray_icon = Icon("QuickCalc", icon_image, menu=menu)
+    tray_icon = Icon(
+        "QuickCalc",
+        icon_image,
+        menu=Menu(MenuItem("Quit", lambda: quit_program(app, tray_icon))),
+    )
 
     threading.Thread(target=tray_icon.run, daemon=True).start()
 
 
+def quit_program(app, tray_icon):
+    """Properly quit the program"""
+    app.hide_window()
+    tray_icon.stop()
+    sys.exit(0)  # Exit the program
+
+
 if __name__ == "__main__":
     app = QuickCalc()
-    create_tray_icon()
+    create_tray_icon(app)
     app.run()
