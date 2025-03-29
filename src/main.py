@@ -9,10 +9,12 @@ import sympy as sp
 from PIL import Image
 from pystray import Icon, Menu, MenuItem
 
+import config_reader as config
+
 
 class QuickCalc:
     def __init__(self):
-        self.root = tk.Tk()
+        self.root: tk.Tk = tk.Tk()
         self.root.withdraw()
 
         self.root.iconbitmap("assets/icon.ico")
@@ -50,7 +52,7 @@ class QuickCalc:
         )
         self.suggestion_label.pack(fill="x", padx=10, pady=5)
 
-        keyboard.add_hotkey("F18", self.show_window)
+        keyboard.add_hotkey(config.App.hotkey, self.show_window)
         keyboard.add_hotkey("tab", self.complete_calculation)
 
     def show_window(self):
@@ -109,7 +111,7 @@ class QuickCalc:
         self.root.mainloop()
 
 
-def create_tray_icon(app):
+def create_tray_icon(app: QuickCalc):
     icon_image = Image.open("assets/icon.ico")
     tray_icon = Icon(
         "QuickCalc",
@@ -120,15 +122,9 @@ def create_tray_icon(app):
     threading.Thread(target=tray_icon.run, daemon=True).start()
 
 
-def quit_program(app, tray_icon):
+def quit_program(app: QuickCalc, tray_icon):
     """Properly quit the program"""
     app.hide_window()
     tray_icon.stop()
     app.root.quit()
     app.root.destroy()
-
-
-if __name__ == "__main__":
-    app = QuickCalc()
-    create_tray_icon(app)
-    app.run()
