@@ -94,9 +94,10 @@ class QuickCalc:
         text = self.text_widget.get("1.0", "end-1c")
         if text.endswith("="):
             try:
-                match = re.search(r"([0-9+\-*/().]+)=$", text)
+                match = re.search(r"([0-9+\-*/().^]+)=$", text)
                 if match:
                     expr = match.group(1)
+                    expr = expr.replace("^", "**")  # Handle exponentiation
                     result = simp.sympify(expr)
 
                     # Check if the result simplifies to an integer
