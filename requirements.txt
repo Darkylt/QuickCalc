@@ -4,3 +4,4 @@ keyboard==0.13.5
 sympy==1.13.3
 pillow==11.1.0
 PyYAML==6.0.2
+pywin32==310

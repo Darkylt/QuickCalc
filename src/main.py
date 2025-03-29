@@ -5,7 +5,7 @@ import tkinter as tk
 
 import keyboard
 import pyautogui
-import sympy as sp
+import sympy as simp
 from PIL import Image
 from pystray import Icon, Menu, MenuItem
 
@@ -82,7 +82,7 @@ class QuickCalc:
                 match = re.search(r"([0-9+\-*/().]+)=$", text)
                 if match:
                     expr = match.group(1)
-                    result = sp.sympify(expr)
+                    result = simp.sympify(expr)
 
                     # Check if the result simplifies to an integer
                     if result.is_Integer:
