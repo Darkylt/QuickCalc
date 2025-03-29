@@ -1,3 +1,4 @@
+import re
 import threading
 import tkinter as tk
 
@@ -68,16 +69,21 @@ class QuickCalc:
         text = self.text_var.get()
         if text.endswith("="):
             try:
-                expr = text[:-1]
-                result = sp.sympify(expr)
+                # Extract the last valid math expression using regex
+                match = re.search(r"([0-9+\-*/().]+)=$", text)
+                if match:
+                    expr = match.group(1)
+                    result = sp.sympify(expr)
 
-                # Check if the result simplifies to an integer
-                if result.is_Integer:
-                    self.suggestion_var.set(str(result))
-                elif result.is_real:
-                    # Convert to string and strip trailing zeros
-                    result_str = str(result.evalf())
-                    self.suggestion_var.set(result_str.rstrip("0").rstrip("."))
+                    # Check if the result simplifies to an integer
+                    if result.is_Integer:
+                        self.suggestion_var.set(str(result))
+                    elif result.is_real:
+                        # Convert to string and strip trailing zeros
+                        result_str = str(result.evalf())
+                        self.suggestion_var.set(result_str.rstrip("0").rstrip("."))
+                    else:
+                        self.suggestion_var.set("")
                 else:
                     self.suggestion_var.set("")
             except Exception:
