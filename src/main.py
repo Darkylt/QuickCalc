@@ -56,6 +56,7 @@ class QuickCalc:
         )
         self.text_widget.pack(expand=True, fill="both", padx=10, pady=5)
         self.text_widget.bind("<KeyRelease>", self.update_suggestion)
+        self.text_widget.bind("<Delete>", lambda event: self.hide_window())
 
         self.suggestion_label = tk.Label(
             self.root,
