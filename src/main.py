@@ -1,7 +1,7 @@
 import tkinter as tk
 
 import keyboard
-import sympy as sp  # Safe mathematical evaluation
+import sympy as sp
 
 
 class QuickCalc:
@@ -78,6 +78,9 @@ class QuickCalc:
         if self.suggestion_var.get():
             self.text_var.set(self.text_var.get() + self.suggestion_var.get())
             self.suggestion_var.set("")
+
+            self.entry.icursor(len(self.text_var.get()))
+            self.entry.select_clear()
         return "break"
 
     def run(self):
