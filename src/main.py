@@ -4,6 +4,7 @@ import threading
 import tkinter as tk
 
 import keyboard
+import pyautogui
 import sympy as sp
 from PIL import Image
 from pystray import Icon, Menu, MenuItem
@@ -53,7 +54,10 @@ class QuickCalc:
         keyboard.add_hotkey("tab", self.complete_calculation)
 
     def show_window(self):
-        print("Showing window")
+        mouse_x, mouse_y = pyautogui.position()
+
+        self.root.geometry(f"+{mouse_x}+{mouse_y}")
+
         self.root.after(
             0,
             lambda: [
@@ -65,7 +69,7 @@ class QuickCalc:
         )
 
     def hide_window(self):
-        print("Hiding window")
+        # print("Hiding window")
         self.root.withdraw()
 
     def update_suggestion(self, event=None):
