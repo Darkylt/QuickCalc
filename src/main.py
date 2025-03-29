@@ -13,9 +13,9 @@ from pystray import Icon, Menu, MenuItem
 import config_reader as config
 
 # Determine base path (supports both script & executable)
-if getattr(sys, "frozen", False):  # Running as PyInstaller bundle
+if getattr(sys, "frozen", False):
     BASE_PATH = sys._MEIPASS
-else:  # Running as a normal script
+else:
     BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 ICON_PATH = os.path.join(BASE_PATH, "icon.ico")
@@ -26,7 +26,6 @@ class QuickCalc:
         self.root: tk.Tk = tk.Tk()
         self.root.withdraw()
 
-        # Ensure the icon file exists before setting it
         if os.path.exists(ICON_PATH):
             try:
                 self.root.iconbitmap(ICON_PATH)
@@ -37,7 +36,7 @@ class QuickCalc:
 
         self.root.title("QuickCalc")
         self.root.geometry("400x120")
-        self.root.minsize(400, 120)  # Set minimum width and height
+        self.root.minsize(400, 120)
         self.root.configure(bg="#333333")
         self.root.attributes("-topmost", True)
 

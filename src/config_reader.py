@@ -3,15 +3,13 @@ import sys
 
 import yaml
 
-# Determine base path (works for both script and executable)
-if getattr(sys, "frozen", False):  # Running as a PyInstaller bundle
+if getattr(sys, "frozen", False):
     BASE_PATH = sys._MEIPASS
-else:  # Running as a normal Python script
+else:
     BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 CONFIG_PATH = os.path.join(BASE_PATH, "config.yml")
 
-# Check if config.yml exists
 if not os.path.exists(CONFIG_PATH):
     raise Exception(f"Configuration file not found: {CONFIG_PATH}")
 
