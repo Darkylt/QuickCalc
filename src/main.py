@@ -57,14 +57,17 @@ class QuickCalc:
         if text.endswith("="):
             try:
                 expr = text[:-1]
-                result = sp.sympify(expr).evalf()
+                result = sp.sympify(expr)
 
-                if result.is_integer:
-                    result = int(result)
+                # Check if the result simplifies to an integer
+                if result.is_Integer:
+                    self.suggestion_var.set(str(result))
+                elif result.is_real:
+                    # Convert to string and strip trailing zeros
+                    result_str = str(result.evalf())
+                    self.suggestion_var.set(result_str.rstrip("0").rstrip("."))
                 else:
-                    result = float(result)
-
-                self.suggestion_var.set(str(result))
+                    self.suggestion_var.set("")
             except Exception:
                 self.suggestion_var.set("")
         else:
