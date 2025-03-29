@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 import threading
@@ -11,13 +12,28 @@ from pystray import Icon, Menu, MenuItem
 
 import config_reader as config
 
+# Determine base path (supports both script & executable)
+if getattr(sys, "frozen", False):  # Running as PyInstaller bundle
+    BASE_PATH = sys._MEIPASS
+else:  # Running as a normal script
+    BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+
+ICON_PATH = os.path.join(BASE_PATH, "icon.ico")
+
 
 class QuickCalc:
     def __init__(self):
         self.root: tk.Tk = tk.Tk()
         self.root.withdraw()
 
-        self.root.iconbitmap("assets/icon.ico")
+        # Ensure the icon file exists before setting it
+        if os.path.exists(ICON_PATH):
+            try:
+                self.root.iconbitmap(ICON_PATH)
+            except tk.TclError:
+                print(f"Error: Failed to load icon file at {ICON_PATH}")
+        else:
+            print(f"Warning: Icon file not found at {ICON_PATH}")
 
         self.root.title("QuickCalc")
         self.root.geometry("400x120")
@@ -112,7 +128,7 @@ class QuickCalc:
 
 
 def create_tray_icon(app: QuickCalc):
-    icon_image = Image.open("assets/icon.ico")
+    icon_image = Image.open(ICON_PATH)
     tray_icon = Icon(
         "QuickCalc",
         icon_image,
