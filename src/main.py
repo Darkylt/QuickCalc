@@ -124,8 +124,11 @@ class QuickCalc:
     def switch_tab(self, name):
         if self.current_tab is not None:
             self.tabs[self.current_tab] = self.text_widget.get("1.0", "end-1c")
+            self.tab_buttons[self.current_tab].configure(fg_color="#555555")
 
         self.current_tab = name
+        self.tab_buttons[self.current_tab].configure(fg_color="#333333")
+
         self.text_widget.delete("1.0", "end")
         self.text_widget.insert("1.0", self.tabs[name])
         self.update_suggestion()
