@@ -101,7 +101,12 @@ class QuickCalc:
 
     def add_tab(self, name=None):
         if name is None:
-            name = f"Tab {len(self.tabs) + 1}"
+            # Generate a unique tab name
+            base_name = "Tab"
+            counter = 1
+            while f"{base_name} {counter}" in self.tabs:
+                counter += 1
+            name = f"{base_name} {counter}"
 
         button = ctk.CTkButton(
             self.tab_frame,
