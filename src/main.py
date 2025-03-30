@@ -49,10 +49,18 @@ class QuickCalc:
         self.tab_frame = tk.Frame(self.root, bg="#444444")
         self.tab_frame.pack(fill="x", padx=5, pady=5)
 
-        self.add_tab_button = tk.Button(
-            self.tab_frame, text="+", command=self.add_tab, bg="#666666", fg="white"
+        self.add_tab_button = ctk.CTkButton(
+            self.tab_frame,
+            text="+",
+            command=self.add_tab,
+            corner_radius=15,
+            fg_color="#555555",
+            text_color="white",
+            hover_color="#666666",
+            width=40,
+            height=30,
         )
-        self.add_tab_button.pack(side="right", padx=5)
+        self.add_tab_button.pack(side="right", padx=5, pady=5)
 
         self.text_var = tk.StringVar()
         self.suggestion_var = tk.StringVar()
@@ -95,17 +103,16 @@ class QuickCalc:
         if name is None:
             name = f"Tab {len(self.tabs) + 1}"
 
-        # Create a modern, rounded button for the tab
         button = ctk.CTkButton(
             self.tab_frame,
             text=name,
             command=lambda n=name: self.switch_tab(n),
-            corner_radius=15,  # Rounded corners
-            fg_color="#555555",  # Background color
-            text_color="white",  # Text color
-            hover_color="#666666",  # Hover effect color
-            width=80,  # Button width
-            height=30,  # Button height
+            corner_radius=15,
+            fg_color="#555555",
+            text_color="white",
+            hover_color="#666666",
+            width=80,
+            height=30,
         )
         button.pack(side="left", padx=5, pady=5)
         button.bind("<Button-3>", lambda event, n=name: self.show_tab_menu(event, n))
@@ -132,10 +139,8 @@ class QuickCalc:
     def rename_tab(self, old_name):
         button = self.tab_buttons[old_name]
 
-        # Hide the button temporarily
         button.pack_forget()
 
-        # Create an entry widget for renaming
         entry = ctk.CTkEntry(
             self.tab_frame,
             font=("Arial", 12),
@@ -143,40 +148,33 @@ class QuickCalc:
             text_color="white",
             corner_radius=10,
         )
-        entry.pack(side="left", padx=5, pady=5)  # Use pack to position the entry
+        entry.pack(side="left", padx=5, pady=5)
         entry.insert(0, old_name)
         entry.focus_set()
 
         def set_new_name(event=None):
             new_name = entry.get().strip()
             if new_name and new_name not in self.tabs:
-                # Update the tab name in the dictionaries
                 self.tabs[new_name] = self.tabs.pop(old_name)
                 self.tab_buttons[new_name] = self.tab_buttons.pop(old_name)
 
-                # Update the button text
                 button.configure(text=new_name)
 
                 button.unbind("<Button-3>")
 
-                # Rebind the right-click menu to the renamed button
                 button.bind(
                     "<Button-3>", lambda event, n=new_name: self.show_tab_menu(event, n)
                 )
 
-                # Destroy the entry and show the updated button
                 entry.destroy()
                 button.pack(side="left", padx=5, pady=5)
             else:
-                # If the name is invalid or already exists, cancel renaming
                 cancel_rename()
 
         def cancel_rename(event=None):
-            # Destroy the entry and show the button again
             entry.destroy()
             button.pack(side="left", padx=5, pady=5)
 
-        # Bind Enter and Escape keys to confirm or cancel renaming
         entry.bind("<Return>", set_new_name)
         entry.bind("<Escape>", cancel_rename)
 
