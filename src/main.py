@@ -95,14 +95,19 @@ class QuickCalc:
         if name is None:
             name = f"Tab {len(self.tabs) + 1}"
 
-        button = tk.Button(
+        # Create a modern, rounded button for the tab
+        button = ctk.CTkButton(
             self.tab_frame,
             text=name,
             command=lambda n=name: self.switch_tab(n),
-            bg="#555555",
-            fg="white",
+            corner_radius=15,  # Rounded corners
+            fg_color="#555555",  # Background color
+            text_color="white",  # Text color
+            hover_color="#666666",  # Hover effect color
+            width=80,  # Button width
+            height=30,  # Button height
         )
-        button.pack(side="left", padx=2)
+        button.pack(side="left", padx=5, pady=5)
         button.bind("<Button-3>", lambda event, n=name: self.show_tab_menu(event, n))
 
         self.tabs[name] = ""
@@ -126,45 +131,52 @@ class QuickCalc:
 
     def rename_tab(self, old_name):
         button = self.tab_buttons[old_name]
-        x, y, width, height = (
-            button.winfo_x(),
-            button.winfo_y(),
-            button.winfo_width(),
-            button.winfo_height(),
-        )
 
-        entry = tk.Entry(
+        # Hide the button temporarily
+        button.pack_forget()
+
+        # Create an entry widget for renaming
+        entry = ctk.CTkEntry(
             self.tab_frame,
             font=("Arial", 12),
-            bg="#555555",
-            fg="white",
-            insertbackground="white",
+            fg_color="#555555",
+            text_color="white",
+            corner_radius=10,
         )
-        entry.place(x=x, y=y, width=width, height=height)
+        entry.pack(side="left", padx=5, pady=5)  # Use pack to position the entry
         entry.insert(0, old_name)
         entry.focus_set()
 
         def set_new_name(event=None):
             new_name = entry.get().strip()
             if new_name and new_name not in self.tabs:
+                # Update the tab name in the dictionaries
                 self.tabs[new_name] = self.tabs.pop(old_name)
                 self.tab_buttons[new_name] = self.tab_buttons.pop(old_name)
 
-                self.tab_buttons[new_name].config(
-                    text=new_name, command=lambda n=new_name: self.switch_tab(n)
-                )
+                # Update the button text
+                button.configure(text=new_name)
 
-                self.tab_buttons[new_name].bind(
+                button.unbind("<Button-3>")
+
+                # Rebind the right-click menu to the renamed button
+                button.bind(
                     "<Button-3>", lambda event, n=new_name: self.show_tab_menu(event, n)
                 )
 
-                if self.current_tab == old_name:
-                    self.current_tab = new_name
-            entry.destroy()
+                # Destroy the entry and show the updated button
+                entry.destroy()
+                button.pack(side="left", padx=5, pady=5)
+            else:
+                # If the name is invalid or already exists, cancel renaming
+                cancel_rename()
 
         def cancel_rename(event=None):
+            # Destroy the entry and show the button again
             entry.destroy()
+            button.pack(side="left", padx=5, pady=5)
 
+        # Bind Enter and Escape keys to confirm or cancel renaming
         entry.bind("<Return>", set_new_name)
         entry.bind("<Escape>", cancel_rename)
 
