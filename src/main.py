@@ -5,6 +5,7 @@ import threading
 import tkinter as tk
 from tkinter import simpledialog, ttk
 
+import customtkinter as ctk
 import keyboard
 import pyautogui
 import sympy as simp
@@ -56,16 +57,22 @@ class QuickCalc:
         self.text_var = tk.StringVar()
         self.suggestion_var = tk.StringVar()
 
-        self.text_widget = tk.Text(
-            self.root,
+        ctk.set_appearance_mode("Dark")
+        ctk.set_default_color_theme("dark-blue")
+
+        self.text_frame = ctk.CTkFrame(self.root, corner_radius=10, fg_color="#1a1a1a")
+        self.text_frame.pack(expand=True, fill="both", padx=10, pady=5)
+
+        self.text_widget = ctk.CTkTextbox(
+            self.text_frame,
             font=("Arial", 16),
-            bg="#333333",
-            fg="white",
-            insertbackground="white",
+            fg_color="#1a1a1a",
+            text_color="white",
+            corner_radius=10,
             wrap="word",
             height=2,
         )
-        self.text_widget.pack(expand=True, fill="both", padx=10, pady=5)
+        self.text_widget.pack(expand=True, fill="both", padx=5, pady=5)
         self.text_widget.bind("<KeyRelease>", self.update_suggestion)
         self.text_widget.bind("<Delete>", lambda event: self.hide_window())
 
