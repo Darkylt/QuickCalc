@@ -14,6 +14,8 @@ QuickCalc is a lightweight and fast calculator application designed for personal
 ### Option 1: Download the Executable
 You can download the pre-built executable from the [Releases](https://github.com/Darkylt/QuickCalc/releases) tab.
 
+_The trigger key in the pre-built version is `F18`._
+
 ### Option 2: Build It Yourself
 1. Clone the repository:
    ```sh
