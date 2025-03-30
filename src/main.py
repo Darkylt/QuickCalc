@@ -199,12 +199,18 @@ class QuickCalc:
         entry.bind("<Escape>", cancel_rename)
 
     def delete_tab(self, name):
-        if len(self.tabs) > 1:
+        if len(self.tabs) > 1:  # Ensure there is more than one tab
+            if name == self.current_tab:
+                # Switch to another tab before deleting the current one
+                remaining_tab = next(tab for tab in self.tabs if tab != name)
+                self.switch_tab(remaining_tab)
+
+            # Remove the tab and its button
             self.tabs.pop(name)
             self.tab_buttons[name].destroy()
             self.tab_buttons.pop(name)
-            remaining_tab = next(iter(self.tabs))
-            self.switch_tab(remaining_tab)
+        else:
+            print("Cannot delete the last remaining tab.")
 
     def show_window(self):
         mouse_x, mouse_y = pyautogui.position()
