@@ -34,6 +34,11 @@ class QuickCalc:
         self.root.attributes("-topmost", True)
         self.root.protocol("WM_DELETE_WINDOW", self.hide_window)
 
+        # Disable maximize button but keep resizable
+        self.root.resizable(True, True)
+        self.root.overrideredirect(False)  # Ensure the window decorations are visible
+        self.root.attributes("-toolwindow", True)  # Removes the maximize button
+
         if os.path.exists(ICON_PATH):
             try:
                 self.root.iconbitmap(ICON_PATH)
