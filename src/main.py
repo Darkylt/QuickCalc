@@ -3,6 +3,7 @@ import re
 import sys
 import threading
 import tkinter as tk
+from tkinter import ttk
 
 import keyboard
 import pyautogui
@@ -25,6 +26,12 @@ class QuickCalc:
     def __init__(self):
         self.root: tk.Tk = tk.Tk()
         self.root.withdraw()
+        self.root.title("QuickCalc")
+        self.root.geometry("400x180")
+        self.root.minsize(400, 180)
+        self.root.configure(bg="#333333")
+        self.root.attributes("-topmost", True)
+        self.root.protocol("WM_DELETE_WINDOW", self.hide_window)
 
         if os.path.exists(ICON_PATH):
             try:
@@ -34,13 +41,16 @@ class QuickCalc:
         else:
             print(f"Warning: Icon file not found at {ICON_PATH}")
 
-        self.root.title("QuickCalc")
-        self.root.geometry("400x120")
-        self.root.minsize(400, 120)
-        self.root.configure(bg="#333333")
-        self.root.attributes("-topmost", True)
+        self.tabs = {}
+        self.current_tab = None
 
-        self.root.protocol("WM_DELETE_WINDOW", self.hide_window)
+        self.tab_frame = tk.Frame(self.root, bg="#444444")
+        self.tab_frame.pack(fill="x", padx=5, pady=5)
+
+        self.add_tab_button = tk.Button(
+            self.tab_frame, text="+", command=self.add_tab, bg="#666666", fg="white"
+        )
+        self.add_tab_button.pack(side="right", padx=5)
 
         self.text_var = tk.StringVar()
         self.suggestion_var = tk.StringVar()
@@ -71,11 +81,36 @@ class QuickCalc:
         keyboard.add_hotkey(config.App.hotkey, self.show_window)
         keyboard.add_hotkey("tab", self.complete_calculation)
 
+        self.add_tab("Tab 1")
+
+    def add_tab(self, name=None):
+        if name is None:
+            name = f"Tab {len(self.tabs) + 1}"
+
+        button = tk.Button(
+            self.tab_frame,
+            text=name,
+            command=lambda n=name: self.switch_tab(n),
+            bg="#555555",
+            fg="white",
+        )
+        button.pack(side="left", padx=2)
+
+        self.tabs[name] = ""
+        self.switch_tab(name)
+
+    def switch_tab(self, name):
+        if self.current_tab is not None:
+            self.tabs[self.current_tab] = self.text_widget.get("1.0", "end-1c")
+
+        self.current_tab = name
+        self.text_widget.delete("1.0", "end")
+        self.text_widget.insert("1.0", self.tabs[name])
+        self.update_suggestion()
+
     def show_window(self):
         mouse_x, mouse_y = pyautogui.position()
-
         self.root.geometry(f"+{mouse_x}+{mouse_y}")
-
         self.root.after(
             0,
             lambda: [
@@ -87,11 +122,9 @@ class QuickCalc:
         )
 
     def hide_window(self):
-        # print("Hiding window")
         self.root.withdraw()
 
     def update_suggestion(self, event=None):
-        """Dynamically updates the suggestion label when typing"""
         text = self.text_widget.get("1.0", "end-1c")
         if text.endswith("="):
             try:
@@ -101,11 +134,9 @@ class QuickCalc:
                     expr = expr.replace("^", "**")  # Handle exponentiation
                     result = simp.sympify(expr)
 
-                    # Check if the result simplifies to an integer
                     if result.is_Integer:
                         self.suggestion_var.set(str(result))
                     elif result.is_real:
-                        # Convert to string and strip trailing zeros
                         result_str = str(result.evalf())
                         self.suggestion_var.set(result_str.rstrip("0").rstrip("."))
                     else:
@@ -118,7 +149,6 @@ class QuickCalc:
             self.suggestion_var.set("")
 
     def complete_calculation(self, event=None):
-        """Completes the calculation when Enter or Tab is pressed"""
         if self.suggestion_var.get():
             self.text_widget.insert("end", self.suggestion_var.get())
             self.suggestion_var.set("")
@@ -135,12 +165,10 @@ def create_tray_icon(app: QuickCalc):
         icon_image,
         menu=Menu(MenuItem("Quit", lambda: quit_program(app, tray_icon))),
     )
-
     threading.Thread(target=tray_icon.run, daemon=True).start()
 
 
 def quit_program(app: QuickCalc, tray_icon):
-    """Properly quit the program"""
     app.hide_window()
     tray_icon.stop()
     app.root.quit()
