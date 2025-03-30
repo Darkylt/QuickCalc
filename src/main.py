@@ -95,7 +95,7 @@ class QuickCalc:
         self.suggestion_label.pack(fill="x", padx=10, pady=5)
 
         keyboard.add_hotkey(config.App.hotkey, self.show_window)
-        keyboard.add_hotkey("tab", self.complete_calculation)
+        self.text_widget.bind("<Tab>", self.complete_calculation)
 
         self.add_tab("Tab 1")
 
