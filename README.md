@@ -48,6 +48,7 @@ Edit the config.yml file to set your preferred hotkey. For example:
 ```yaml
 hotkey: F12
 ```
+**Remember to configure prior to building!**
 
 ## Notes
 - This program is tailored to my personal needs and system. Feature requests will not be accepted.
