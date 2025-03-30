@@ -163,29 +163,23 @@ class QuickCalc:
         def set_new_name(event=None):
             new_name = entry.get().strip()
             if new_name and new_name not in self.tabs:
-                # Update the tabs dictionary
                 self.tabs[new_name] = self.tabs.pop(old_name)
 
-                # Update the button's text and command
                 button.configure(
                     text=new_name, command=lambda n=new_name: self.switch_tab(n)
                 )
 
-                # Update the tab_buttons dictionary
                 self.tab_buttons.pop(old_name)
                 self.tab_buttons[new_name] = button
 
-                # Rebind the right-click menu to the new name
                 button.unbind("<Button-3>")
                 button.bind(
                     "<Button-3>", lambda event, n=new_name: self.show_tab_menu(event, n)
                 )
 
-                # Destroy the entry widget and re-add the button
                 entry.destroy()
                 button.pack(side="left", padx=5, pady=5)
 
-                # If the renamed tab is the current tab, update the current_tab reference
                 if self.current_tab == old_name:
                     self.current_tab = new_name
             else:
@@ -199,13 +193,11 @@ class QuickCalc:
         entry.bind("<Escape>", cancel_rename)
 
     def delete_tab(self, name):
-        if len(self.tabs) > 1:  # Ensure there is more than one tab
+        if len(self.tabs) > 1:
             if name == self.current_tab:
-                # Switch to another tab before deleting the current one
                 remaining_tab = next(tab for tab in self.tabs if tab != name)
                 self.switch_tab(remaining_tab)
 
-            # Remove the tab and its button
             self.tabs.pop(name)
             self.tab_buttons[name].destroy()
             self.tab_buttons.pop(name)
