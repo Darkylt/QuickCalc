@@ -3,7 +3,7 @@ import re
 import sys
 import threading
 import tkinter as tk
-from tkinter import ttk
+from tkinter import simpledialog, ttk
 
 import keyboard
 import pyautogui
@@ -43,6 +43,7 @@ class QuickCalc:
 
         self.tabs = {}
         self.current_tab = None
+        self.tab_buttons = {}
 
         self.tab_frame = tk.Frame(self.root, bg="#444444")
         self.tab_frame.pack(fill="x", padx=5, pady=5)
@@ -95,8 +96,10 @@ class QuickCalc:
             fg="white",
         )
         button.pack(side="left", padx=2)
+        button.bind("<Button-3>", lambda event, n=name: self.show_tab_menu(event, n))
 
         self.tabs[name] = ""
+        self.tab_buttons[name] = button
         self.switch_tab(name)
 
     def switch_tab(self, name):
@@ -107,6 +110,64 @@ class QuickCalc:
         self.text_widget.delete("1.0", "end")
         self.text_widget.insert("1.0", self.tabs[name])
         self.update_suggestion()
+
+    def show_tab_menu(self, event, tab_name):
+        menu = tk.Menu(self.root, tearoff=0)
+        menu.add_command(label="Rename", command=lambda: self.rename_tab(tab_name))
+        menu.add_command(label="Delete", command=lambda: self.delete_tab(tab_name))
+        menu.post(event.x_root, event.y_root)
+
+    def rename_tab(self, old_name):
+        button = self.tab_buttons[old_name]
+        x, y, width, height = (
+            button.winfo_x(),
+            button.winfo_y(),
+            button.winfo_width(),
+            button.winfo_height(),
+        )
+
+        entry = tk.Entry(
+            self.tab_frame,
+            font=("Arial", 12),
+            bg="#555555",
+            fg="white",
+            insertbackground="white",
+        )
+        entry.place(x=x, y=y, width=width, height=height)
+        entry.insert(0, old_name)
+        entry.focus_set()
+
+        def set_new_name(event=None):
+            new_name = entry.get().strip()
+            if new_name and new_name not in self.tabs:
+                self.tabs[new_name] = self.tabs.pop(old_name)
+                self.tab_buttons[new_name] = self.tab_buttons.pop(old_name)
+
+                self.tab_buttons[new_name].config(
+                    text=new_name, command=lambda n=new_name: self.switch_tab(n)
+                )
+
+                self.tab_buttons[new_name].bind(
+                    "<Button-3>", lambda event, n=new_name: self.show_tab_menu(event, n)
+                )
+
+                if self.current_tab == old_name:
+                    self.current_tab = new_name
+            entry.destroy()
+
+        def cancel_rename(event=None):
+            entry.destroy()
+
+        entry.bind("<Return>", set_new_name)
+        entry.bind("<Escape>", cancel_rename)
+
+    def delete_tab(self, name):
+        if len(self.tabs) > 1:
+            self.tabs.pop(name)
+            self.tab_buttons[name].destroy()
+            self.tab_buttons.pop(name)
+            remaining_tab = next(iter(self.tabs))
+            self.switch_tab(remaining_tab)
 
     def show_window(self):
         mouse_x, mouse_y = pyautogui.position()
@@ -131,7 +192,7 @@ class QuickCalc:
                 match = re.search(r"([0-9+\-*/().^]+)=$", text)
                 if match:
                     expr = match.group(1)
-                    expr = expr.replace("^", "**")  # Handle exponentiation
+                    expr = expr.replace("^", "**")
                     result = simp.sympify(expr)
 
                     if result.is_Integer:
