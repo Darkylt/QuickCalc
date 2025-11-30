@@ -5,7 +5,7 @@ use tauri::{
   tray::TrayIconBuilder,
 };
 use tauri::Manager;
-
+use meval;
 
 fn main() {
 
@@ -42,9 +42,10 @@ fn main() {
                                 if let ShortcutState::Pressed = event.state() {
                                     if let Some(window) = app.get_webview_window("main") {
                                         if let Ok(cursor_pos) = window.cursor_position() {
+                                            let window_size = window.outer_size().unwrap_or_default();
                                             let pos = tauri::PhysicalPosition {
-                                                x: cursor_pos.x as i32,
-                                                y: cursor_pos.y as i32,
+                                                x: cursor_pos.x as i32 - (window_size.width / 2) as i32,
+                                                y: cursor_pos.y as i32 - (window_size.height / 2) as i32,
                                             };
                                             let _ = window.set_position(pos);
                                         }
@@ -72,8 +73,12 @@ fn main() {
             }
         })
 
-
-
+        .invoke_handler(tauri::generate_handler![eval_math])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn eval_math(expression: String) -> Result<f64, String> {
+    meval::eval_str(&expression).map_err(|e| e.to_string())
 }

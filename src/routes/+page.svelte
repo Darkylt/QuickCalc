@@ -1,13 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { setupHotkey } from '$lib/hotkey';
-
-  onMount(() => {
-    setupHotkey();
-  });
+  import Editor from "$lib/Editor.svelte";
 </script>
 
 <main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
-  
+  <h1>QuickCalc</h1>
+  <div style="height: 300px; width: 500px;">
+    <Editor />
+  </div>
 </main>

@@ -13,6 +13,10 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.8",
     "@tauri-apps/api": "^2.9.1",
     "@tauri-apps/plugin-global-shortcut": "^2.3.1",
     "@tauri-apps/plugin-opener": "^2",
