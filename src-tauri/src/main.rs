@@ -6,11 +6,26 @@ use tauri::{
 };
 use tauri::Manager;
 use meval;
+use window_vibrancy::{apply_blur};
 
 fn main() {
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
+            #[cfg(target_os = "windows")]
+            {
+                let window = app.get_webview_window("main").unwrap();
+
+                // For a frosted glass blur
+                apply_blur(&window, Some((18, 18, 18, 125)))
+                .expect("apply_blur failed");
+
+                // OR for acrylic (if you prefer)
+                // apply_acrylic(&window, None).expect("apply_acrylic failed");
+            }
+
+
             #[cfg(desktop)]
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&quit_i])?;

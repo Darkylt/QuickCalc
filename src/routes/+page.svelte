@@ -3,7 +3,7 @@
 </script>
 
 <main class="container">
-  <div style="height: 300px; width: 500px;">
+  <div>
     <Editor />
   </div>
 </main>
