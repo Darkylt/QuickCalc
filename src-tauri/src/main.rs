@@ -73,12 +73,17 @@ fn main() {
             }
         })
 
-        .invoke_handler(tauri::generate_handler![eval_math])
+        .invoke_handler(tauri::generate_handler![evaluate_math])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 #[tauri::command]
-fn eval_math(expression: String) -> Result<f64, String> {
-    meval::eval_str(&expression).map_err(|e| e.to_string())
+fn evaluate_math(expr: String) -> Result<String, String> {
+    let expr = expr.replace("^", "**");
+
+    match meval::eval_str(expr) {
+        Ok(val) => Ok(val.to_string()),
+        Err(_) => Err("Invalid expression".into()),
+    }
 }

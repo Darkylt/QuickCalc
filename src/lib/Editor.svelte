@@ -1,77 +1,89 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { EditorView, keymap, highlightActiveLine } from "@codemirror/view";
-  import { EditorState } from "@codemirror/state";
-  import { javascript } from "@codemirror/lang-javascript";
-  import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
   import { invoke } from "@tauri-apps/api/core";
 
-  let editorDiv: HTMLDivElement;
-  let editor: EditorView;
+  let text = "";
+  let suggestion = "";
+  let textarea: HTMLTextAreaElement;
 
-  async function evaluateExpression(expr: string): Promise<number> {
-    return invoke<number>("eval_math", { expression: expr });
+  const match = text.match(/([0-9+\-*/().^]+)=/);
+
+
+  async function updateSuggestion() {
+    if (!match) {
+      suggestion = "";
+      return;
+    }
+
+    const expr = match[1];
+
+    try {
+      const result = await invoke("evaluate_math", { expr });
+      suggestion = String(result);
+    } catch (e) {
+      suggestion = "";
+    }
   }
 
-  function getMathExpressionAtCursor(doc: string, cursorPos: number): { from: number; to: number; expr: string } | null {
-    const beforeCursor = doc.slice(0, cursorPos);
-    const eqIndex = beforeCursor.lastIndexOf("=");
-    if (eqIndex === -1) return null;
 
-    const expr = beforeCursor.slice(eqIndex + 1).trim();
-    if (!/^[0-9+\-*/().\s]+$/.test(expr)) return null;
+  function acceptSuggestion() {
+    if (!suggestion) return;
+    if (!match) return;
 
-    return { from: eqIndex + 1, to: cursorPos, expr };
+    const expr = match[0];
+    const fullMatch = match[0];
+    const index = text.indexOf(fullMatch);
+
+    const before = text.slice(0, index + fullMatch.length);
+    const after = text.slice(index + fullMatch.length);
+
+    text = before + suggestion + after;
+    suggestion = "";
   }
 
-  function provideMathCompletion() {
-    return autocompletion({
-      override: [
-        async (context: CompletionContext) => {
-          const doc = context.state.doc.toString();
-          const math = getMathExpressionAtCursor(doc, context.pos);
-          if (!math) return null;
 
-          try {
-            const result = await evaluateExpression(math.expr);
-            return {
-              from: math.from,
-              to: math.to,
-              options: [
-                {
-                  label: result.toString(),
-                  type: "keyword",
-                  apply: (view, completion, from, to) => {
-                    view.dispatch({
-                      changes: { from, to, insert: result.toString() },
-                      selection: { anchor: from + result.toString().length },
-                    });
-                  },
-                },
-              ],
-            };
-          } catch {
-            return null;
-          }
-        },
-      ],
-    });
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === "Tab" && suggestion) {
+      e.preventDefault();
+      acceptSuggestion();
+    }
   }
-
-  onMount(() => {
-    editor = new EditorView({
-      state: EditorState.create({
-        doc: "",
-        extensions: [
-          javascript(),
-          keymap.of([]),
-          highlightActiveLine(),
-          provideMathCompletion(),
-        ],
-      }),
-      parent: editorDiv,
-    });
-  });
 </script>
 
-<div bind:this={editorDiv} style="height: 100%; width: 100%;"></div>
+<div class="editor-wrapper">
+  <textarea
+    bind:this={textarea}
+    bind:value={text}
+    on:input={updateSuggestion}
+    on:keydown={handleKeydown}
+  ></textarea>
+
+  {#if suggestion}
+    <div class="ghost">
+      {suggestion}
+    </div>
+  {/if}
+</div>
+
+<style>
+  .editor-wrapper {
+    position: relative;
+  }
+
+  textarea {
+    width: 100%;
+    height: 100%;
+    font-family: monospace;
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  .ghost {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    opacity: 0.4;
+    font-family: monospace;
+    pointer-events: none;
+  }
+</style>
