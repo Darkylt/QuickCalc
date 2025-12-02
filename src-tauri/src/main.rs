@@ -17,12 +17,8 @@ fn main() {
             {
                 let window = app.get_webview_window("main").unwrap();
 
-                // For a frosted glass blur
                 apply_blur(&window, Some((18, 18, 18, 125)))
                 .expect("apply_blur failed");
-
-                // OR for acrylic (if you prefer)
-                // apply_acrylic(&window, None).expect("apply_acrylic failed");
             }
 
 
@@ -98,7 +94,10 @@ fn evaluate_math(expr: String) -> Result<String, String> {
     let expr = expr.replace("^", "**");
 
     match meval::eval_str(expr) {
-        Ok(val) => Ok(val.to_string()),
+        Ok(val) => {
+            let rounded = (val * 1e12).round() / 1e12;
+            Ok(rounded.to_string())
+        }
         Err(_) => Err("Invalid expression".into()),
     }
 }

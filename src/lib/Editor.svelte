@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
+  import { invoke } from "@tauri-apps/api/core";
 
   let text = "";
   let suggestion = "";
-
   let textarea: HTMLTextAreaElement;
+  let shadowStyle = "";
 
   async function updateSuggestion() {
     const match = text.match(/([0-9+\-*/().^]+)=/);
@@ -47,9 +47,23 @@
       acceptSuggestion();
     }
   }
+
+  function updateShadow() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const spread = Math.min(width, height) / 5; // scale factor
+    const blur = Math.min(width, height) / 20;
+    shadowStyle = `inset 0 0 ${blur}px rgba(132, 0, 255, 0.1), inset 0 0 ${spread}px rgba(132, 0, 255, 0.1)`;
+  }
+
+  onMount(() => {
+    updateShadow();
+    window.addEventListener("resize", updateShadow);
+    return () => window.removeEventListener("resize", updateShadow);
+  });
 </script>
 
-<div class="editor-container">
+<div class="editor-container" style="box-shadow: {shadowStyle}">
   <textarea
     bind:this={textarea}
     bind:value={text}
@@ -66,15 +80,10 @@
 
 <style>
 .editor-container {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  flex: 1;
   background: rgba(17, 17, 17);
-  padding: 0;
   overflow: hidden;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.1),
-    0 4px 40px rgba(0,0,0,0.6),
-    0 0 30px rgba(132, 0, 255, 0.15);
 }
 
 .editor {
@@ -102,18 +111,5 @@
   opacity: 0.6;
   color: #8f4ff7;
   pointer-events: none;
-}
-
-.editor::-webkit-scrollbar {
-  width: 10px;
-}
-
-.editor::-webkit-scrollbar-thumb {
-  background: #2e2e2e;
-  border-radius: 10px;
-}
-
-.editor::-webkit-scrollbar-thumb:hover {
-  background: #444;
 }
 </style>

@@ -18,9 +18,11 @@
         "minWidth": 400,
         "minHeight": 180,
         "alwaysOnTop": true,
-        "visible": true
+        "visible": true,
+        "decorations": false
       }
     ],
+    
     "security": {
       "csp": null
     }
