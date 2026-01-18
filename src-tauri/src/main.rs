@@ -41,10 +41,10 @@ fn main() {
 
             {
                 use tauri_plugin_global_shortcut::{
-                    Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState,
+                    Code, GlobalShortcutExt, Shortcut, ShortcutState,
                 };
 
-                let hotkey = Shortcut::new(Some(Modifiers::CONTROL), Code::Space);
+                let hotkey = Shortcut::new(None, Code::F13);
 
                 app.handle().plugin(
                     tauri_plugin_global_shortcut::Builder::new()
