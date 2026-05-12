@@ -2,6 +2,8 @@
   import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
   const win = getCurrentWebviewWindow();
 
+  export let onSettingsClick: () => void = () => {};
+
   function minimize() {
     win.minimize();
   }
@@ -18,6 +20,7 @@
   <div class="title">QuickCalc</div>
 
   <div class="window-controls">
+    <button class="btn settings" on:click={onSettingsClick} title="Settings">⚙</button>
     <button class="btn" on:click={minimize}>—</button>
     <button class="btn close" on:click={close}>×</button>
   </div>
@@ -92,6 +95,13 @@
     0 0 10px rgba(160, 60, 255, 0.4),
     0 0 4px rgba(160, 60, 255, 0.5) inset;
   transform: translateY(-1px);
+}
+
+.settings:hover {
+  background: rgba(160, 60, 255, 0.22);
+  box-shadow:
+    0 0 10px rgba(160, 60, 255, 0.4),
+    0 0 4px rgba(160, 60, 255, 0.5) inset;
 }
 
 .close:hover {

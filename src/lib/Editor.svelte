@@ -56,6 +56,13 @@
     shadowStyle = `inset 0 0 ${blur}px rgba(132, 0, 255, 0.1), inset 0 0 ${spread}px rgba(132, 0, 255, 0.1)`;
   }
 
+  export function focusEnd() {
+    if (!textarea) return;
+    textarea.focus();
+    const len = textarea.value.length;
+    textarea.setSelectionRange(len, len);
+  }
+
   onMount(() => {
     updateShadow();
     window.addEventListener("resize", updateShadow);
@@ -71,6 +78,10 @@
     on:keydown={handleKeydown}
     class="editor"
     placeholder="Type here..."
+    spellcheck="false"
+    autocorrect="off"
+    autocomplete="off"
+    autocapitalize="off"
   ></textarea>
 
   {#if suggestion}
