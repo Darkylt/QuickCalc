@@ -14,9 +14,9 @@
       {
         "title": "QuickCalc",
         "width": 400,
-        "height": 180,
+        "height": 250,
         "minWidth": 400,
-        "minHeight": 180,
+        "minHeight": 250,
         "alwaysOnTop": true,
         "visible": true,
         "decorations": false
