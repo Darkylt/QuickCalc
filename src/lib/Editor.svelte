@@ -90,37 +90,37 @@
 </div>
 
 <style>
-.editor-container {
-  position: relative;
-  flex: 1;
-  background: rgba(17, 17, 17);
-  overflow: hidden;
-}
+  .editor-container {
+    position: relative;
+    flex: 1;
+    background: rgba(17, 17, 17);
+    overflow: hidden;
+  }
 
-.editor {
-  width: 100%;
-  height: 100%;
-  resize: none;
-  background: transparent;
-  border: none;
-  outline: none;
-  padding: 18px;
-  color: #eaeaea;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: 18px;
-  line-height: 1.5;
-  caret-color: #8f4ff7;
-  box-sizing: border-box;
-}
+  .editor {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 18px;
+    color: #eaeaea;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 18px;
+    line-height: 1.5;
+    caret-color: #8f4ff7;
+    box-sizing: border-box;
+  }
 
-.suggestion {
-  position: absolute;
-  bottom: 14px;
-  right: 18px;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: 18px;
-  opacity: 0.6;
-  color: #8f4ff7;
-  pointer-events: none;
-}
+  .suggestion {
+    position: absolute;
+    bottom: 14px;
+    right: 18px;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 18px;
+    opacity: 0.6;
+    color: #8f4ff7;
+    pointer-events: none;
+  }
 </style>
