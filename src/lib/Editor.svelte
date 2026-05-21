@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
+  import { isTimeExpression, evaluateTime } from "./timeExpr";
 
   let text = "";
   let suggestion = "";
@@ -8,27 +9,45 @@
   let shadowStyle = "";
 
   async function updateSuggestion() {
-    const match = text.match(/([0-9+\-*/().^]+)=/);
+    // Match any expression ending with `=`
+    // Supports time expressions (colons, am/pm, durations, ->) and math
+    const match = text.match(/([\w\s\d:+\-*/().^,>@]+?)=/);
 
     if (!match) {
       suggestion = "";
       return;
     }
 
-    const expr = match[1];
+    const expr = match[1].trim();
 
-    try {
-      const result = await invoke("evaluate_math", { expr });
-      suggestion = String(result);
-    } catch {
-      suggestion = "";
+    // Try time expression first
+    if (isTimeExpression(expr)) {
+      const result = evaluateTime(expr);
+      if (result !== null) {
+        suggestion = result;
+        return;
+      }
     }
+
+    // Fall back to Rust math evaluator
+    // Only send if it looks like a pure math expression to avoid noise
+    if (/^[0-9+\-*/().^]+$/.test(expr)) {
+      try {
+        const result = await invoke("evaluate_math", { expr });
+        suggestion = String(result);
+      } catch {
+        suggestion = "";
+      }
+      return;
+    }
+
+    suggestion = "";
   }
 
   function acceptSuggestion() {
     if (!suggestion) return;
 
-    const match = text.match(/([0-9+\-*/().^]+)=/);
+    const match = text.match(/([\w\s\d:+\-*/().^,>@]+?)=/);
     if (!match) return;
 
     const fullMatch = match[0];
@@ -41,7 +60,7 @@
     suggestion = "";
   }
 
-  function handleKeydown(e) {
+  function handleKeydown(e: KeyboardEvent) {
     if (e.key === "Tab" && suggestion) {
       e.preventDefault();
       acceptSuggestion();
@@ -51,7 +70,7 @@
   function updateShadow() {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const spread = Math.min(width, height) / 5; // scale factor
+    const spread = Math.min(width, height) / 5;
     const blur = Math.min(width, height) / 20;
     shadowStyle = `inset 0 0 ${blur}px rgba(132, 0, 255, 0.1), inset 0 0 ${spread}px rgba(132, 0, 255, 0.1)`;
   }
